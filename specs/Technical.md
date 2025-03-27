@@ -3,11 +3,7 @@
 ## Tech Stack
 
 ### Frontend Framework
-- Qwik
-  - No SSR implementation
-  - Client-side rendering
-  - Component architecture
-  - State management
+- React
 
 ### Styling
 - TailwindCSS

@@ -1,4 +1,3 @@
-
 import { ExternalLink } from 'lucide-react';
 
 type LinkedInPost = {
@@ -86,7 +85,7 @@ const LinkedInFeed = () => {
 
 const LinkedInPostCard = ({ post, delay }: { post: LinkedInPost; delay: number }) => (
   <div 
-    className={`glass-panel rounded-xl p-6 shadow-sm hover-card-animation delay-${delay} opacity-0 animate-fade-in`}
+    className={`glass-panel rounded-xl p-6 shadow-sm hover-card-animation opacity-0 animate-fade-in delay-${delay}`}
   >
     <div className="flex items-start gap-4">
       <div className="h-12 w-12 rounded-full bg-primary/10 overflow-hidden flex-shrink-0">

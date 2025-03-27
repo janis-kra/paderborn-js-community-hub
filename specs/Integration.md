@@ -22,6 +22,12 @@
 
 ## LinkedIn Integration
 
+### Authentication
+- LinkedIn API credentials
+- Access token management
+- API limitations
+- Rate limiting
+
 ### Post Fetching
 - Latest 3 posts retrieval
 - Media handling

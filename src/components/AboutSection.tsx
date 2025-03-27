@@ -1,4 +1,3 @@
-
 import { Code, Users, Calendar } from 'lucide-react';
 
 const AboutSection = () => {
@@ -57,7 +56,7 @@ const AboutSection = () => {
               <ul className="space-y-4">
                 {expectations.map((item, index) => (
                   <li key={index} className="flex items-start gap-3">
-                    <span className="h-6 w-6 shrink-0 rounded-full bg-jsyellow flex items-center justify-center text-xs font-bold">
+                    <span className="h-6 w-6 flex-shrink-0 rounded-full bg-jsyellow flex items-center justify-center text-xs font-bold">
                       {index + 1}
                     </span>
                     <span>{item}</span>

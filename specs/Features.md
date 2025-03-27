@@ -77,6 +77,7 @@
 1. LinkedIn integration
 2. Code of Conduct
 3. Basic SEO implementation
+4. Image slideshow of pictures from previous meetups
 
 ### Phase 3
 1. Speakers section

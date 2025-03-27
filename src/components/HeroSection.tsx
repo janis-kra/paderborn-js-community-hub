@@ -1,19 +1,32 @@
-
 import { useState, useEffect } from 'react';
-import { ArrowRight, MapPin, Calendar } from 'lucide-react';
-
-// Mockup data - would be replaced with actual API call in production
-const meetupData = {
-  title: "Modern JavaScript: State of the Art 2024",
-  date: "2024-07-15T19:00:00",
-  location: "Zukunftsmeile 1, 33102 Paderborn",
-  url: "https://meetup.com/paderbornjs",
-};
+import { ArrowRight, MapPin, Calendar, Users } from 'lucide-react';
+import { getMeetupData, type MeetupEvent } from '../api/meetupApi';
 
 const HeroSection = () => {
   const [timeLeft, setTimeLeft] = useState("");
+  const [meetupData, setMeetupData] = useState<MeetupEvent | null>(null);
+  const [loading, setLoading] = useState(true);
   
+  // Fetch meetup data
   useEffect(() => {
+    const fetchMeetupData = async () => {
+      try {
+        const data = await getMeetupData();
+        setMeetupData(data);
+      } catch (error) {
+        console.error('Error fetching meetup data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchMeetupData();
+  }, []);
+  
+  // Calculate time left until the meetup
+  useEffect(() => {
+    if (!meetupData) return;
+    
     const calculateTimeLeft = () => {
       const meetupTime = new Date(meetupData.date).getTime();
       const now = new Date().getTime();
@@ -36,7 +49,7 @@ const HeroSection = () => {
     }, 60000);
     
     return () => clearInterval(timer);
-  }, []);
+  }, [meetupData]);
   
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = { 
@@ -87,7 +100,7 @@ const HeroSection = () => {
               </a>
               
               <a 
-                href={meetupData.url} 
+                href={meetupData?.url || "https://meetup.com/paderbornjs"} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-secondary text-secondary-foreground px-6 py-3 rounded-full font-medium hover:bg-secondary/80 transition-colors"
@@ -100,37 +113,60 @@ const HeroSection = () => {
         
         <div className="flex items-center justify-center opacity-0 animate-fade-in delay-400">
           <div className="w-full max-w-md glass-panel rounded-2xl p-8 hover-card-animation">
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h3 className="font-display font-semibold text-xl">Next Meetup</h3>
-                <span className="text-sm text-primary font-medium animate-subtle-pulse">
-                  In {timeLeft}
-                </span>
+            {loading ? (
+              <div className="flex items-center justify-center h-48">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
               </div>
-              
-              <h2 className="font-bold text-2xl">{meetupData.title}</h2>
-              
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 text-sm text-foreground/80">
-                  <Calendar size={16} className="text-primary" />
-                  <span>{formatDate(meetupData.date)}</span>
+            ) : meetupData ? (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-display font-semibold text-xl">Next Meetup</h3>
+                  <span className="text-sm text-primary font-medium animate-subtle-pulse">
+                    In {timeLeft}
+                  </span>
                 </div>
                 
-                <div className="flex items-center gap-3 text-sm text-foreground/80">
-                  <MapPin size={16} className="text-primary" />
-                  <span>{meetupData.location}</span>
+                <h2 className="font-bold text-2xl">{meetupData.title}</h2>
+                
+                {meetupData.description && (
+                  <p className="text-sm text-foreground/70">
+                    {meetupData.description}
+                  </p>
+                )}
+                
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 text-sm text-foreground/80">
+                    <Calendar size={16} className="text-primary" />
+                    <span>{formatDate(meetupData.date)}</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 text-sm text-foreground/80">
+                    <MapPin size={16} className="text-primary" />
+                    <span>{meetupData.location}</span>
+                  </div>
+                  
+                  {meetupData.attendees !== undefined && meetupData.maxAttendees !== undefined && (
+                    <div className="flex items-center gap-3 text-sm text-foreground/80">
+                      <Users size={16} className="text-primary" />
+                      <span>{meetupData.attendees} / {meetupData.maxAttendees} attendees</span>
+                    </div>
+                  )}
                 </div>
+                
+                <a 
+                  href={meetupData.url}
+                  target="_blank"
+                  rel="noopener noreferrer" 
+                  className="block w-full text-center bg-primary text-primary-foreground py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors shadow-sm"
+                >
+                  RSVP on Meetup
+                </a>
               </div>
-              
-              <a 
-                href={meetupData.url}
-                target="_blank"
-                rel="noopener noreferrer" 
-                className="block w-full text-center bg-primary text-primary-foreground py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors shadow-sm"
-              >
-                RSVP on Meetup
-              </a>
-            </div>
+            ) : (
+              <div className="text-center p-8">
+                <p className="text-foreground/70">No upcoming meetups found.</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
