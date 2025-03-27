@@ -1,47 +1,31 @@
+import { useState, useEffect } from 'react';
 import { ExternalLink } from 'lucide-react';
-
-type LinkedInPost = {
-  id: string;
-  date: string;
-  author: string;
-  content: string;
-  likes: number;
-  comments: number;
-  image?: string;
-};
+import { getLinkedInPosts, type LinkedInPost } from '../api/linkedinApi';
 
 const LinkedInFeed = () => {
-  // Mock data for LinkedIn posts
-  const mockPosts: LinkedInPost[] = [
-    {
-      id: "post1",
-      date: "2 days ago",
-      author: "PaderbornJS",
-      content: "Excited to announce our next meetup on Modern React Patterns! Join us next Thursday at 6:30 PM at the Digital Hub. RSVP on our Meetup page!",
-      likes: 24,
-      comments: 5
-    },
-    {
-      id: "post2",
-      date: "1 week ago",
-      author: "PaderbornJS",
-      content: "Thanks to everyone who attended our TypeScript workshop yesterday! Special thanks to our speaker, Anna Schmidt, for the great presentation on advanced type system features. Slides are now available on our GitHub.",
-      likes: 32,
-      comments: 8,
-      image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "post3",
-      date: "2 weeks ago",
-      author: "PaderbornJS",
-      content: "Are you using Node.js for your backend? We're planning a series on backend JavaScript development for our upcoming meetups. Drop your suggestions in the comments!",
-      likes: 18,
-      comments: 12
-    }
-  ];
+  const [posts, setPosts] = useState<LinkedInPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchLinkedInPosts = async () => {
+      try {
+        const data = await getLinkedInPosts();
+        setPosts(data);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching LinkedIn posts:', err);
+        setError('Failed to load LinkedIn posts');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchLinkedInPosts();
+  }, []);
 
   return (
-    <section className="py-24 px-6 bg-background">
+    <section className="py-24 px-6 bg-background" id="linkedin-feed">
       <div className="container mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="inline-block text-xs font-medium bg-primary/10 text-primary px-3 py-1 rounded-full mb-4 opacity-0 animate-fade-in">
@@ -57,15 +41,31 @@ const LinkedInFeed = () => {
           </p>
         </div>
         
-        <div className="flex flex-col gap-6 max-w-2xl mx-auto">
-          {mockPosts.map((post, index) => (
-            <LinkedInPostCard 
-              key={post.id} 
-              post={post} 
-              delay={(index + 3) * 100}
-            />
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex items-center justify-center h-48">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary" role="status" aria-label="Loading"></div>
+          </div>
+        ) : error ? (
+          <div className="text-center p-8 glass-panel rounded-xl max-w-md mx-auto">
+            <p className="text-foreground/70">{error}</p>
+            <p className="text-sm mt-2 text-foreground/50">Please check back later or visit our LinkedIn page directly.</p>
+          </div>
+        ) : posts.length === 0 ? (
+          <div className="text-center p-8 glass-panel rounded-xl max-w-md mx-auto">
+            <p className="text-foreground/70">No posts found.</p>
+            <p className="text-sm mt-2 text-foreground/50">Please check back later or visit our LinkedIn page directly.</p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-6 max-w-2xl mx-auto">
+            {posts.map((post, index) => (
+              <LinkedInPostCard 
+                key={post.id} 
+                post={post} 
+                delay={(index + 3) * 100}
+              />
+            ))}
+          </div>
+        )}
         
         <div className="text-center mt-10 opacity-0 animate-fade-in delay-600">
           <a 

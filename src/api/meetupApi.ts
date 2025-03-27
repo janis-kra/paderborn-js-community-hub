@@ -1,3 +1,4 @@
+const SECRET_API_KEY = 'bXktc2VjcmV0LWFwaS1rZXk=';
 // Types for meetup data
 export type MeetupEvent = {
   title: string;
