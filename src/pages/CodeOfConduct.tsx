@@ -1,6 +1,7 @@
 
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { ModeToggle } from '../components/ModeToggle';
 
 const CodeOfConduct = () => {
   return (
@@ -16,9 +17,13 @@ const CodeOfConduct = () => {
             <p className="text-lg text-foreground/80 opacity-0 animate-fade-in delay-100">
               The Berlin Code of Conduct
             </p>
+            {/* Add theme toggle here since we can't modify Navbar directly */}
+            <div className="flex justify-center mt-4">
+              <ModeToggle />
+            </div>
           </div>
           
-          <div className="prose prose-lg max-w-none">
+          <div className="prose prose-lg max-w-none dark:prose-invert">
             <section className="mb-10 opacity-0 animate-fade-in delay-200">
               <h2 className="text-2xl font-display font-semibold mb-4">Purpose</h2>
               <p>
