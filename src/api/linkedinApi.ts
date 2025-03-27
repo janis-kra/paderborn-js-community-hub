@@ -39,31 +39,53 @@ const mockLinkedInPosts: LinkedInPost[] = [
   }
 ];
 
-// Function to get LinkedIn posts
-export const getLinkedInPosts = async (): Promise<LinkedInPost[]> => {
-  // Simulate API request delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  // In a real app, this would be replaced with actual API call
-  // Example: const response = await fetch('https://api.linkedin.com/v2/activitystreams/...');
-  // return await response.json();
-  
-  return mockLinkedInPosts;
+// Helper function to get API token from environment variables with validation
+const getLinkedInApiToken = (): string => {
+  const apiToken = import.meta.env.VITE_LINKEDIN_API_TOKEN;
+  if (!apiToken) {
+    console.error('LINKEDIN_API_TOKEN environment variable is not set');
+    // In a production app, you might want to throw an error or handle this differently
+  }
+  return apiToken;
 };
 
-// In a real application, you would add error handling, authentication, caching, etc.
-// Example authentication implementation:
-/*
-const LINKEDIN_API_TOKEN = process.env.LINKEDIN_API_TOKEN;
+// Function to get LinkedIn posts
+export const getLinkedInPosts = async (): Promise<LinkedInPost[]> => {
+  try {
+    // Get API token securely from environment variable
+    const apiToken = getLinkedInApiToken();
+    
+    // Simulate API request delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // In a real app, this would be replaced with actual API call with proper authentication
+    // Example: 
+    // const response = await fetch('https://api.linkedin.com/v2/activitystreams/...', {
+    //   headers: {
+    //     'Authorization': `Bearer ${apiToken}`,
+    //     'Content-Type': 'application/json'
+    //   }
+    // });
+    // if (!response.ok) {
+    //   throw new Error(`LinkedIn API error: ${response.status}`);
+    // }
+    // return await response.json();
+    
+    return mockLinkedInPosts;
+  } catch (error) {
+    console.error('Error fetching LinkedIn posts:', error);
+    // Return fallback data or throw an error based on your app's needs
+    return [];
+  }
+};
 
-async function getAuthToken() {
-  // This would fetch or refresh the token from LinkedIn
-  return LINKEDIN_API_TOKEN;
-}
-
+// Real implementation of authentication - using environment variables instead of hardcoded values
 export const getLinkedInPostsWithAuth = async (): Promise<LinkedInPost[]> => {
   try {
-    const token = await getAuthToken();
+    // Get token from environment variable
+    const token = getLinkedInApiToken();
+    
+    // Make authenticated request
     const response = await fetch('https://api.linkedin.com/v2/activitystreams/...', {
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -83,8 +105,38 @@ export const getLinkedInPostsWithAuth = async (): Promise<LinkedInPost[]> => {
   }
 };
 
-function transformLinkedInData(data: any): LinkedInPost[] {
+// Define types for LinkedIn API response
+type LinkedInApiResponse = {
+  elements: Array<{
+    id: string;
+    created: {
+      time: number; // timestamp
+    };
+    author: {
+      name: string;
+    };
+    content: {
+      text: string;
+    };
+    socialActivity: {
+      likeCount: number;
+      commentCount: number;
+    };
+    media?: {
+      url: string;
+    }[];
+  }>;
+};
+
+function transformLinkedInData(data: LinkedInApiResponse): LinkedInPost[] {
   // Transform LinkedIn API response to our internal format
-  // This would depend on the exact API response structure
-}
-*/ 
+  return data.elements.map(item => ({
+    id: item.id,
+    date: new Date(item.created.time).toLocaleString(),
+    author: item.author.name,
+    content: item.content.text,
+    likes: item.socialActivity.likeCount,
+    comments: item.socialActivity.commentCount,
+    image: item.media?.[0]?.url
+  }));
+} 
