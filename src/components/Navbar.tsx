@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Github, Calendar } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -19,7 +20,7 @@ const Navbar = () => {
     <header 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled 
-          ? 'py-4 bg-white/80 backdrop-blur-md shadow-sm' 
+          ? 'py-4 bg-white/80 dark:bg-background/80 backdrop-blur-md shadow-sm' 
           : 'py-6 bg-transparent'
       }`}
     >
@@ -41,6 +42,8 @@ const Navbar = () => {
         </nav>
         
         <div className="flex items-center space-x-3 opacity-0 animate-fade-in delay-400">
+          {/* Add ThemeToggle */}
+          <ThemeToggle />
           <SocialButton href="https://github.com/paderbornjs" icon={<Github size={18} />} label="GitHub" />
           <SocialButton href="https://meetup.com/paderbornjs" icon={<Calendar size={18} />} label="Meetup" primary />
         </div>
